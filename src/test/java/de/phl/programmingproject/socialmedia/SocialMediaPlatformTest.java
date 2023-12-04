@@ -14,9 +14,9 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test class for the SocialMedia exercise {@link Main}.
+ * Test class for the SocialMediaPlatform exercise {@link Main}.
  */
-public class SocialMediaTest extends TestBase {
+public class SocialMediaPlatformTest extends TestBase {
 
     Class userClass;
 

@@ -14,9 +14,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the Car Rental exercise.
+ * Tests for the Car Rental System exercise.
  */
-public class CarRentalTest {
+public class CarRentalSystemTest {
 
 
     @Test
