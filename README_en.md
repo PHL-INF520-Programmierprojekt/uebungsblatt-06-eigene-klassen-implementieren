@@ -23,26 +23,26 @@ The classes should be implemented in the `de.phl.programmingprojects.socialmedia
     * `author` (User) - the user who authored the post
     * `timestamp` (Date) - the time the post was created
 
-3. Add a operation to the `User` class called `createPost(final String text)` that creates a new `Post` object and adds it to the list of posts for the user. Use the current date.
+3. Add an operation to the `User` class called `createPost(final String text)` that creates a new `Post` object and adds it to the list of posts for the user. Use the current date.
 
-4. Add a operation to the `User` class called `follow(final User user)` that adds the specified user to the list of users being followed by this user. Keep in mind also to update the followed user by adding this user in the set of followers.
+4. Add an operation to the `User` class called `follow(final User user)` that adds the specified user to the list of users being followed by this user. Keep in mind also to update the followed user by adding this user in the set of followers.
 
-5. Add a operation to the `User` class called `getTimeline()` that returns a list of all the posts authored by users that this user is following.
+5. Add an operation to the `User` class called `getTimeline()` that returns a `List` of all the posts authored by users that this user is following.
 
 6. Create a `SocialMediaPlatform` class with the following property:
-    * `users` (Set of User) - a set of all the users on the platform
+    * `users` (`Set` of User) - a set of all the users on the platform
 
-7. Add a operation to the `SocialMediaPlatform` class called `User createUser(final String username)` that creates a new `User` object with the specified username, and adds it to the list of users on the platform. The created user is returned.
+7. Add an operation to the `SocialMediaPlatform` class called `User createUser(final String username)` that creates and returns a new `User` object with the specified username, and adds it to the set of users on the platform. The created user is returned.
 
-8. Add a operation to the `User` class called `getPostById(final int id)` that returns the `Post` object with the specified id, or throws a `NoSuchElementException` if no such post exists.
+8. Add an operation to the `User` class called `getPostById(final int id)` that returns the `Post` object with the specified id, or throws a `NoSuchElementException` if no such post exists.
 
-9. Add a operation to the `SocialMediaPlatform` class called `getUserById(final int id)` that returns the `User` object with the specified id, or throws a `NoSuchElementException` if no such user exists.
+9. Add an operation to the `SocialMediaPlatform` class called `getUserById(final int id)` that returns the `User` object with the specified id, or throws a `NoSuchElementException` if no such user exists.
 
-10. Add a operation to the `SocialMediaPlatform` class called `getMostFollowedUser()` that returns user with the most followers.
+10. Add an operation to the `SocialMediaPlatform` class called `getMostFollowedUser()` that returns user with the most followers.
 
-11. Add a operation to the `SocialMediaPlatform` class called `getMostActiveUser()` that returns the user with the most posts.
+11. Add an operation to the `SocialMediaPlatform` class called `getMostActiveUser()` that returns the user with the most posts.
 
-12. Implement the `main` operation located in the `Main` class:
+12. Implement the `main` operation located in the `Main` class, that:
     * creates a new `SocialMediaPlatform` object
     * creates at least 5 `User` objects and adds them to the platform
     * has each user create at least 3 posts
@@ -59,34 +59,29 @@ You are tasked with implementing a car rental system for a small car rental comp
 
 1. Define a `Car` class with the following attributes:
 
-- `make` (String): the make of the car (e.g., "Toyota", "Honda", "Ford")
-- `model` (String): the model of the car (e.g., "Camry", "Accord", "Focus")
-- `year` (int): the year the car was made
-- `rented` (boolean): whether the car is currently rented or not (initially set to `false`)
+   - `make` (String): the make of the car (e.g., "Toyota", "Honda", "Ford")
+   - `model` (String): the model of the car (e.g., "Camry", "Accord", "Focus")
+   - `year` (int): the year the car was made
+   - `rented` (boolean): whether the car is currently rented or not (initially set to `false`)
 
 2. Define a `Customer` class with the following attributes:
 
-- `name` (String): the name of the customer
-- `rentedCar` (Optional\<Car\>): the car that the customer has currently rented (initially set to `Optional.empty()`)
+   - `name` (String): the name of the customer
+   - `rentedCar` (Optional\<Car\>): the car that the customer has currently rented (initially set to `Optional.empty()`)
 
 3. Define a `CarRentalSystem` class with the following operations:
 
-- `addCar(final Car car)`: adds a new car to the system
-- `rentCar(final Car car, final Customer customer)`: rents the specified car to the specified customer (if the car is available for rent)
-- `returnCar(final Customer customer)`: returns the car rented by the given customer (i.e., sets the car's `rented` attribute to `false` and sets the customer's `rentedCar` attribute to `Optional.empty()`)
-- `getAvailableCars()`: returns a list of all available cars (i.e., cars with `rented` set to `false`)
-- `getRentedCars()`: returns a list of all rented cars (i.e., cars with `rented` set to `true`)
+   - `addCar(final Car car)`: adds a new car to the system
+   - `rentCar(final Car car, final Customer customer)`: rents the specified car to the specified customer (if the car is available for rent)
+   - `returnCar(final Customer customer)`: returns the car rented by the given customer (i.e., sets the car's `rented` attribute to `false` and sets the customer's `rentedCar` attribute to `Optional.empty()`)
+   - `getAvailableCars()`: returns a list of all available cars (i.e., cars with `rented` set to `false`)
+   - `getRentedCars()`: returns a list of all rented cars (i.e., cars with `rented` set to `true`)
 
 4. Implement a `String toString()` operation in the `Car` class which returns a String representation of a car, i.e., putting all attributes in one joint String and return it.
 
 5. Implement the `main` operation located in the `Main` class:
 
-- Create a new `CarRentalSystem` object
-- Add some cars to the system
-- Create some customers and have them rent and return cars using the `CarRentalSystem` operations
-- Print out the available and rented cars after each rental and return to ensure that the system is working correctly.
-
-
-
-
-**Next Sheet**: [_Object-oriented programming_](Exercise-Sheet-7)
+   - Create a new `CarRentalSystem` object
+   - Add some cars to the system
+   - Create some customers and have them rent and return cars using the `CarRentalSystem` operations
+   - Print out the available and rented cars after each rental and return to ensure that the system is working correctly.
