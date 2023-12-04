@@ -2,6 +2,7 @@ package de.phl.programmingproject.socialmedia;
 
 import de.phl.programmingproject.TestBase;
 import de.phl.programmingproject.TestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,7 @@ public class SocialMediaTest extends TestBase {
                 "de.phl.programmingproject.socialmedia");
     }
 
-    static Class getPotsClass() {
+    static Class getPostClass() {
         return TestUtils.getClassForName("Post",
                 "de.phl.programmingproject.socialmedia");
     }
@@ -41,7 +42,7 @@ public class SocialMediaTest extends TestBase {
             } else if (constructor.getParameterCount() == 1 &&
                     constructor.getParameterTypes()[0] == String.class) {
                 try {
-                    userObject = constructor.newInstance("Test");
+                    userObject = constructor.newInstance("Test User");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -70,6 +71,34 @@ public class SocialMediaTest extends TestBase {
                 "de.phl.programmingproject.socialmedia");
     }
 
+    @AfterEach
+    void tearDown() {
+        // reset static fields of User and Post class
+        if (userClass != null) {
+            resetStaticFields(userClass, 0);
+        }
+
+        try {
+            Class postClass = Class.forName("de.phl.programmingproject.socialmedia.Post");
+            resetStaticFields(postClass, 0);
+        } catch (ClassNotFoundException e) {
+            System.out.println("Post class not yet implemented!");
+        }
+    }
+
+    private static void resetStaticFields(Class clazz, Object defaultValue) {
+        for (Field field : clazz.getDeclaredFields()) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                try {
+                    field.setAccessible(true);
+                    field.set(null, defaultValue);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
     @Test
     public void task_1_User_class_with_properties_implemented() {
 
@@ -88,7 +117,7 @@ public class SocialMediaTest extends TestBase {
 
     @Test
     void task_2_Post_class_with_properties_implemented() {
-        Class postClass = getPotsClass();
+        Class postClass = getPostClass();
 
         assertNotNull(postClass, "The class 'Post' does not exist.");
 
@@ -220,7 +249,7 @@ public class SocialMediaTest extends TestBase {
 
     @Test
     void task_8_User_implements_getPostById() {
-        Class postClass = getPotsClass();
+        Class postClass = getPostClass();
         TestUtils.assertClassHasMethod(userClass, "getPostById", postClass, int.class);
 
         Method getPostByIdMethod = TestUtils.getMethod(userClass, "getPostById", int.class);
@@ -252,14 +281,14 @@ public class SocialMediaTest extends TestBase {
         try {
             Method createUserMethod = TestUtils.getMethod(socialMediaPlatformClass, "createUser", String.class);
             Object socialMediaPlatform = createSocialMediaPlatformObject();
-            createUserMethod.invoke(socialMediaPlatform, "Test");
-            createUserMethod.invoke(socialMediaPlatform, "Test2");
-            createUserMethod.invoke(socialMediaPlatform, "Test3");
+            createUserMethod.invoke(socialMediaPlatform, "User 1");
+            createUserMethod.invoke(socialMediaPlatform, "User 2");
+            createUserMethod.invoke(socialMediaPlatform, "User 3");
             Object userObject = getUserByIdMethod.invoke(socialMediaPlatform, 2);
             assertNotNull(userObject, "The 'getUserById' method of the 'SocialMediaPlatform' class does not return a user object.");
             assertTrue(userObject.getClass().isAssignableFrom(userClass), "The 'getUserById' method of the 'SocialMediaPlatform' class does not return a user object.");
             Field nameField = TestUtils.getField(userClass, "username");
-            assertEquals("Test3", nameField.get(userObject), "The 'getUserById' method of the 'SocialMediaPlatform' class does not return the correct user.");
+            assertEquals("User 3", nameField.get(userObject), "The 'getUserById' method of the 'SocialMediaPlatform' class does not return the correct user.");
             assertThrows(Exception.class, () -> getUserByIdMethod.invoke(socialMediaPlatform, 4),
                     "The 'getUserById' method of the 'SocialMediaPlatform' class does not throw an exception when the user does not exist.");
         } catch (Exception e) {
@@ -282,7 +311,7 @@ public class SocialMediaTest extends TestBase {
             Method createUserMethod = TestUtils.getMethod(socialMediaPlatformClass, "createUser", String.class);
             Object user1 = createUserMethod.invoke(socialMediaPlatform, "Test");
             Object user2 = createUserMethod.invoke(socialMediaPlatform, "Test2");
-            Object user3= createUserMethod.invoke(socialMediaPlatform, "Test3");
+            Object user3 = createUserMethod.invoke(socialMediaPlatform, "Test3");
 
             followMethod.invoke(user1, user2);
             followMethod.invoke(user1, user3);
@@ -311,18 +340,18 @@ public class SocialMediaTest extends TestBase {
         try {
             Object user1 = createUserMethod.invoke(socialMediaPlatform, "Test");
             Object user2 = createUserMethod.invoke(socialMediaPlatform, "Test2");
-            Object user3= createUserMethod.invoke(socialMediaPlatform, "Test3");
+            Object user3 = createUserMethod.invoke(socialMediaPlatform, "Test3");
 
-            createPostMethod.invoke(user1, "Post 1");
-            createPostMethod.invoke(user1, "Post 2");
-            createPostMethod.invoke(user1, "Post 3");
-            createPostMethod.invoke(user2, "Post 1");
-            createPostMethod.invoke(user2, "Post 2");
-            createPostMethod.invoke(user3, "Post 1");
+            createPostMethod.invoke(user1, "Post 1.1");
+            createPostMethod.invoke(user1, "Post 1.2");
+            createPostMethod.invoke(user1, "Post 1.3");
+            createPostMethod.invoke(user2, "Post 2.1");
+            createPostMethod.invoke(user2, "Post 2.2");
+            createPostMethod.invoke(user3, "Post 3.1");
 
             Object mostActiveUser = getMostActiveUserMethod.invoke(socialMediaPlatform);
             assertEquals(user1, mostActiveUser, "The 'getMostActiveUser' method of the 'SocialMediaPlatform' class does not return the user with the most posts.");
-        } catch(Exception e){
+        } catch (Exception e) {
             System.err.println(e);
             fail("Failed to get the most active user in the 'SocialMediaPlatform' class. \n" + e);
         }
