@@ -18,14 +18,17 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class SocialMediaPlatformTest extends TestBase {
 
-    Class userClass;
 
-    static Class getSocialMediaPlatformClass() {
+    private static int USER_CNT;
+
+    Class<?> userClass;
+
+    static Class<?> getSocialMediaPlatformClass() {
         return TestUtils.getClassForName("SocialMediaPlatform",
                 "de.phl.programmingproject.socialmedia");
     }
 
-    static Class getPostClass() {
+    static Class<?> getPostClass() {
         return TestUtils.getClassForName("Post",
                 "de.phl.programmingproject.socialmedia");
     }
@@ -43,6 +46,14 @@ public class SocialMediaPlatformTest extends TestBase {
                     constructor.getParameterTypes()[0] == String.class) {
                 try {
                     userObject = constructor.newInstance("Test User");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (constructor.getParameterCount() == 2 &&
+                    constructor.getParameterTypes()[0] == int.class &&
+                    constructor.getParameterTypes()[1] == String.class) {
+                try {
+                    userObject = constructor.newInstance(USER_CNT++, "Test User");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -79,7 +90,7 @@ public class SocialMediaPlatformTest extends TestBase {
         }
 
         try {
-            Class postClass = Class.forName("de.phl.programmingproject.socialmedia.Post");
+            Class<?> postClass = Class.forName("de.phl.programmingproject.socialmedia.Post");
             resetStaticFields(postClass, 0);
         } catch (ClassNotFoundException e) {
             System.out.println("Post class not yet implemented!");
@@ -102,7 +113,7 @@ public class SocialMediaPlatformTest extends TestBase {
     @Test
     public void task_1_User_class_with_properties_implemented() {
 
-        Map<String, Class> expectedFields = new LinkedHashMap() {
+        Map<String, Class<?>> expectedFields = new LinkedHashMap() {
             {
                 put("id", int.class);
                 put("username", String.class);
@@ -117,7 +128,7 @@ public class SocialMediaPlatformTest extends TestBase {
 
     @Test
     void task_2_Post_class_with_properties_implemented() {
-        Class postClass = getPostClass();
+        Class<?> postClass = getPostClass();
 
         assertNotNull(postClass, "The class 'Post' does not exist.");
 
@@ -127,7 +138,7 @@ public class SocialMediaPlatformTest extends TestBase {
          *     * `author` (User) - the user who authored the post
          *     * `timestamp` (Date) - the time the post was created
          */
-        Map<String, Class> expectedFields = new LinkedHashMap() {
+        Map<String, Class<?>> expectedFields = new LinkedHashMap() {
             {
                 put("id", int.class);
                 put("text", String.class);
@@ -217,7 +228,7 @@ public class SocialMediaPlatformTest extends TestBase {
 
     @Test
     void task_6_SocialMediaPlatform_class_with_properties_implemented() {
-        Class socialMediaPlatformClass = getSocialMediaPlatformClass();
+        Class<?> socialMediaPlatformClass = getSocialMediaPlatformClass();
 
         assertNotNull(socialMediaPlatformClass, "The class 'SocialMediaPlatform' does not exist.");
 
@@ -226,7 +237,7 @@ public class SocialMediaPlatformTest extends TestBase {
 
     @Test
     void task_7_SocialMediaPlatform_implements_createUser() {
-        Class socialMediaPlatformClass = getSocialMediaPlatformClass();
+        Class<?> socialMediaPlatformClass = getSocialMediaPlatformClass();
 
         TestUtils.assertClassHasMethod(socialMediaPlatformClass, "createUser", userClass, String.class);
 
@@ -249,7 +260,7 @@ public class SocialMediaPlatformTest extends TestBase {
 
     @Test
     void task_8_User_implements_getPostById() {
-        Class postClass = getPostClass();
+        Class<?> postClass = getPostClass();
         TestUtils.assertClassHasMethod(userClass, "getPostById", postClass, int.class);
 
         Method getPostByIdMethod = TestUtils.getMethod(userClass, "getPostById", int.class);
@@ -274,7 +285,7 @@ public class SocialMediaPlatformTest extends TestBase {
 
     @Test
     void task_9_SocialMediaPlatform_implements_getUserById() {
-        Class socialMediaPlatformClass = getSocialMediaPlatformClass();
+        Class<?> socialMediaPlatformClass = getSocialMediaPlatformClass();
         TestUtils.assertClassHasMethod(socialMediaPlatformClass, "getUserById", userClass, int.class);
 
         Method getUserByIdMethod = TestUtils.getMethod(socialMediaPlatformClass, "getUserById", int.class);
@@ -299,7 +310,7 @@ public class SocialMediaPlatformTest extends TestBase {
 
     @Test
     void task_10_SocialMediaPlatform_implements_getMostFollowedUser() {
-        Class socialMediaPlatformClass = getSocialMediaPlatformClass();
+        Class<?> socialMediaPlatformClass = getSocialMediaPlatformClass();
 
         TestUtils.assertClassHasMethod(socialMediaPlatformClass, "getMostFollowedUser", userClass);
 
@@ -328,7 +339,7 @@ public class SocialMediaPlatformTest extends TestBase {
 
     @Test
     void task_11_SocialMediaPlatform_implements_getMostActiveUser() {
-        Class socialMediaPlatformClass = getSocialMediaPlatformClass();
+        Class<?> socialMediaPlatformClass = getSocialMediaPlatformClass();
 
         TestUtils.assertClassHasMethod(socialMediaPlatformClass, "getMostActiveUser", userClass);
 

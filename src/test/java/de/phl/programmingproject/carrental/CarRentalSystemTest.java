@@ -30,9 +30,9 @@ public class CarRentalSystemTest {
 - `rented` (boolean): whether the car is currently rented or not (initially set to `false`)
          */
 
-        Class carClass = getCarClass();
+        Class<?>carClass = getCarClass();
 
-        Map<String, Class> expectedProperties = new HashMap<String, Class>() {{
+        Map<String,  Class<?>> expectedProperties = new HashMap<String,  Class<?>>() {{
             put("make", String.class);
             put("model", String.class);
             put("year", int.class);
@@ -45,8 +45,8 @@ public class CarRentalSystemTest {
     @Test
     void task_2_Customer_class_with_properties_implemented() {
 
-        Class customerClass = TestUtils.getClassForName("Customer", "de.phl.programmingproject.carrental");
-        Map<String, Class> expectedProperties = new HashMap<String, Class>() {{
+        Class<?>customerClass = TestUtils.getClassForName("Customer", "de.phl.programmingproject.carrental");
+        Map<String,  Class<?>> expectedProperties = new HashMap<String,  Class<?>>() {{
             put("name", String.class);
             put("rentedCar", Optional.class);
         }};
@@ -65,8 +65,8 @@ public class CarRentalSystemTest {
 
     @Test
     void task_3_CarRentalSystem_implements_addCar() {
-        Class carRentalSystemClass = getCarRentalSystemClass();
-        Class carClass = getCarClass();
+        Class<?>carRentalSystemClass = getCarRentalSystemClass();
+        Class<?>carClass = getCarClass();
         TestUtils.assertClassHasMethod(carRentalSystemClass, "addCar", void.class, carClass);
 
         Object carRentalSystem = createCarRentalSystem();
@@ -86,9 +86,9 @@ public class CarRentalSystemTest {
 
     @Test
     void task_3_CarRentalSystem_implements_rentCar() {
-        Class carRentalSystemClass = getCarRentalSystemClass();
-        Class carClass = getCarClass();
-        Class customerClass = getCustomerClass();
+        Class<?>carRentalSystemClass = getCarRentalSystemClass();
+        Class<?>carClass = getCarClass();
+        Class<?>customerClass = getCustomerClass();
         TestUtils.assertClassHasMethod(carRentalSystemClass, "rentCar", void.class, customerClass, carClass);
 
         Object carRentalSystem = createCarRentalSystem();
@@ -111,8 +111,8 @@ public class CarRentalSystemTest {
 
     @Test
     void task_3_CarRentalSystem_implements_returnCar() {
-        Class carRentalSystemClass = getCarRentalSystemClass();
-        Class customerClass = getCustomerClass();
+        Class<?>carRentalSystemClass = getCarRentalSystemClass();
+        Class<?>customerClass = getCustomerClass();
         TestUtils.assertClassHasMethod(carRentalSystemClass, "returnCar", void.class, customerClass);
 
         Object carRentalSystem = createCarRentalSystem();
@@ -138,7 +138,7 @@ public class CarRentalSystemTest {
 
     @Test
     void task_3_CarRentalSystem_implements_getAvailableCars() {
-        Class carRentalSystemClass = getCarRentalSystemClass();
+        Class<?>carRentalSystemClass = getCarRentalSystemClass();
         TestUtils.assertClassHasMethod(carRentalSystemClass, "getAvailableCars", Collection.class);
 
         Object carRentalSystem = createCarRentalSystem();
@@ -157,7 +157,7 @@ public class CarRentalSystemTest {
     }
     @Test
     void task_3_CarRentalSystem_implements_getRentedCars(){
-        Class carRentalSystemClass = getCarRentalSystemClass();
+        Class<?>carRentalSystemClass = getCarRentalSystemClass();
         TestUtils.assertClassHasMethod(carRentalSystemClass, "getRentedCars", Collection.class);
 
         Object carRentalSystem = createCarRentalSystem();
@@ -180,7 +180,7 @@ public class CarRentalSystemTest {
 
     @Test
     void task_4_Car_implements_toString() {
-        Class carClass = getCarClass();
+        Class<?>carClass = getCarClass();
         TestUtils.assertClassHasMethod(carClass, "toString", String.class);
 
         Object car = createCar();
@@ -214,20 +214,20 @@ public class CarRentalSystemTest {
 
     }
 
-    static Class getCarClass() {
+    static Class<?>getCarClass() {
         return TestUtils.getClassForName("Car", "de.phl.programmingproject.carrental");
     }
 
-    static Class getCustomerClass() {
+    static Class<?>getCustomerClass() {
         return TestUtils.getClassForName("Customer", "de.phl.programmingproject.carrental");
     }
 
-    static Class getCarRentalSystemClass() {
+    static Class<?>getCarRentalSystemClass() {
         return TestUtils.getClassForName("CarRentalSystem", "de.phl.programmingproject.carrental");
     }
 
     static Object createCarRentalSystem() {
-        Class carRentalSystemClass = TestUtils.getClassForName("CarRentalSystem", "de.phl.programmingproject.carrental");
+        Class<?>carRentalSystemClass = TestUtils.getClassForName("CarRentalSystem", "de.phl.programmingproject.carrental");
         Object carRentalSystem = null;
         try {
             carRentalSystem = carRentalSystemClass.getDeclaredConstructor().newInstance();
@@ -239,7 +239,7 @@ public class CarRentalSystemTest {
     }
 
     static Object createCar() {
-        Class carClass = TestUtils.getClassForName("Car", "de.phl.programmingproject.carrental");
+        Class<?>carClass = TestUtils.getClassForName("Car", "de.phl.programmingproject.carrental");
         Object car = null;
         try {
             for (Constructor constructor : carClass.getDeclaredConstructors()) {
@@ -267,7 +267,7 @@ public class CarRentalSystemTest {
     }
 
     static Object createCustomer(String name) {
-        Class customerClass = getCustomerClass();
+        Class<?>customerClass = getCustomerClass();
         Object customer = null;
         try {
             for (Constructor constructor : customerClass.getDeclaredConstructors()) {

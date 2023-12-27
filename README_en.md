@@ -6,7 +6,7 @@ In this exercise sheet, you will learn to write your own Java classes (and progr
 ## Exercise: Social Media Platform
 
 You are tasked with designing a social media platform where users can create profiles, post messages, and follow other users.
-The classes should be implemented in the `de.phl.programmingprojects.socialmedia` package.
+The classes should be implemented in the `de.phl.programmingproject.socialmedia` package.
 
 ### Tasks
 
@@ -72,7 +72,7 @@ You are tasked with implementing a car rental system for a small car rental comp
 3. Define a `CarRentalSystem` class with the following operations:
 
    - `addCar(final Car car)`: adds a new car to the system
-   - `rentCar(final Car car, final Customer customer)`: rents the specified car to the specified customer (if the car is available for rent)
+   - `rentCar(final Customer customer, final Car car)`: rents the specified car to the specified customer (if the car is available for rent)
    - `returnCar(final Customer customer)`: returns the car rented by the given customer (i.e., sets the car's `rented` attribute to `false` and sets the customer's `rentedCar` attribute to `Optional.empty()`)
    - `getAvailableCars()`: returns a list of all available cars (i.e., cars with `rented` set to `false`)
    - `getRentedCars()`: returns a list of all rented cars (i.e., cars with `rented` set to `true`)

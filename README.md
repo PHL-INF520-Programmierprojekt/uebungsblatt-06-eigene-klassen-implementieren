@@ -6,7 +6,7 @@ In diesem Übungsblatt lernen Sie, Ihre eigenen Java-Klassen (und Programme) von
 ## Übung: Soziale Medien Plattform (Social Media Platform)
 
 Ihre Aufgabe ist es, eine soziale Medienplattform zu entwerfen (`Social Media Platform`), auf der Nutzer&ast;innen Profile erstellen, Nachrichten posten und anderen Nutzer&ast;innen folgen können.
-Die Klassen sollen im Paket `de.phl.programmingprojects.socialmedia` implementiert werden.
+Die Klassen sollen im Paket `de.phl.programmingproject.socialmedia` implementiert werden.
 
 ### Aufgaben
 
@@ -26,9 +26,9 @@ Die Klassen sollen im Paket `de.phl.programmingprojects.socialmedia` implementie
 
 3. Fügen Sie der `User`-Klasse eine Operation namens `createPost(final String text)` hinzu, die ein neues `Post`-Objekt erstellt und es zur Liste der Beiträge für den/die Nutzer&ast;in hinzufügt. Verwenden Sie das aktuelle Datum.
 
-4. Fügen Sie der `User`-Klasse eine Operation namens `follow(final User user)` hinzu, die den/die angegebenen Nutzer*in zur Liste der Nutzer&ast;innen hinzufügt, denen diese&ast;r Nutzer&ast;in folgt. Denken Sie auch daran, den/die gefolgten Nutzer&ast;in zu aktualisieren, indem Sie diese&ast;n Nutzer&at;in zum Set der Follower hinzufügen.
+4. Fügen Sie der `User`-Klasse eine Operation namens `follow(final User user)` hinzu, die den/die angegebenen Nutzer&ast;in zur Liste der Nutzer&ast;innen hinzufügt, denen diese&ast;r Nutzer&ast;in folgt. Denken Sie auch daran, den/die gefolgten Nutzer&ast;in zu aktualisieren, indem Sie diese&ast;n Nutzer&at;in zum Set der Follower hinzufügen.
 
-5. Fügen Sie der `User`-Klasse eine Operation namens `getTimeline()` hinzu, die eine `Liste` aller Beiträge zurückgibt, die von Nutzer&ast;innen verfasst wurden, denen diese&at;r Nutzer&ast;in folgt.
+5. Fügen Sie der `User`-Klasse eine Operation namens `getTimeline()` hinzu, die eine `Liste` aller Beiträge zurückgibt, die von Nutzer&ast;innen verfasst wurden, denen diese&ast;r Nutzer&ast;in folgt.
 
 6. Erstellen Sie eine `SocialMediaPlatform`-Klasse mit der folgenden Eigenschaft:
     * `users` (`Set` von User) - ein Set aller Nutzer&ast;innen auf der Plattform
@@ -73,7 +73,7 @@ Ihre Aufgabe ist es, ein Autovermietungssystem für eine kleine Autovermietung z
 3. Implementieren Sie eine `CarRentalSystem`-Klasse mit den folgenden Operationen:
 
     - `addCar(final Car car)`: fügt ein neues Auto zum System hinzu
-    - `rentCar(final Car car, final Customer customer)`: vermietet das angegebene Auto an den/die angegebene&ast;n Kund&ast;in (wenn das Auto verfügbar ist)
+    - `rentCar(final Customer customer, final Car car)`: vermietet das angegebene Auto an den/die angegebene&ast;n Kund&ast;in (wenn das Auto verfügbar ist)
     - `returnCar(final Customer customer)`: gibt das von dem/der gegebenen Kund&ast;in gemietete Auto zurück (d.h., setzt das `rented`-Attribut des Autos auf `false` und setzt das `rentedCar`-Attribut des/der Kund&ast;in auf `Optional.empty()`)
     - `getAvailableCars()`: gibt eine Liste aller verfügbaren Autos zurück (d.h., Autos mit `rented` auf `false` gesetzt)
     - `getRentedCars()`: gibt eine Liste aller vermieteten Autos zurück (d.h., Autos mit `rented` auf `true` gesetzt)
