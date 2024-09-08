@@ -5,6 +5,9 @@ import de.phl.programmingproject.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
+import org.mockito.invocation.Invocation;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -370,8 +373,7 @@ public class SocialMediaPlatformTest extends TestBase {
 
     @Test
     void task_12_main_method_implemented() {
-
-        // TODO: use Powermock to spy on the SocialMediaPlatform and User object and verify that the methods are called
+        Class<?> userClass = TestUtils.getClassForName("User", "de.phl.programmingproject.socialmedia");
 
         /*
          * creates a new `SocialMediaPlatform` object
@@ -382,42 +384,40 @@ public class SocialMediaPlatformTest extends TestBase {
          * calls the `getMostFollowedUser` operation and prints out the user's name
          * calls the `getMostActiveUser` operation and prints out the user's name
          */
-        String content = TestUtils.getFileContentForFileInRootOrSrcDirectory("main/java/de/phl/programmingproject/socialmedia/Main.java");
 
-        // assert that at least 5x createUser is called
-        int createUserCnt = 0;
-        int createPostCnt = 0;
-        int followCnt = 0;
-        int getTimelineCnt = 0;
+        try (MockedConstruction<?> mockedUserConstruction = Mockito.mockConstruction(userClass)) {
+            Main.main(new String[]{});
+
+            assertEquals(5, mockedUserConstruction.constructed().size(), "The 'createUser' method in the 'main' method of the 'Main' file is expected to be called 5 times.");
+
+            for (Object usr : mockedUserConstruction.constructed()) {
+                Collection<Invocation> invocations = Mockito.mockingDetails(usr).getInvocations();
+
+                long createPostCnt = invocations.stream().filter(inv -> inv.getMethod().getName().equals("createPost")).count();
+                assertTrue(createPostCnt >= 3, String.format("The 'createPost' method is expected to be called at least 3 times per user, but was called %d times.", createPostCnt));
+
+                long followCnt = invocations.stream().filter(inv -> inv.getMethod().getName().equals("follow")).count();
+                assertTrue(followCnt >= 2, String.format("The 'follow' method is expected to be called at least 2 times per user, but was called %d times.", followCnt));
+
+                long getTimelineCnt = invocations.stream().filter(inv -> inv.getMethod().getName().equals("getTimeline")).count();
+                assertTrue(getTimelineCnt >= 1, String.format("The 'getTimeline' method is expected to be called at least once per user, but was called %d times.", getTimelineCnt));
+            }
+        } catch (Exception e) {
+            fail("Failed to verify the main method implementation. \n" + e);
+        }
+
+        // verify that the getMostFollowedUser and getMostActiveUser methods are called
+        String content = TestUtils.getFileContentForFileInRootOrSrcDirectory("main/java/de/phl/programmingproject/socialmedia/Main.java");
         int getMostFollowedUserCnt = 0;
         int getMostActiveUserCnt = 0;
         for (String s : content.split("\n")) {
-            if (s.contains("createUser("))
-                createUserCnt++;
-            else if (s.contains("createPost("))
-                createPostCnt++;
-            else if (s.contains("follow("))
-                followCnt++;
-            else if (s.contains("getTimeline("))
-                getTimelineCnt++;
-            else if (s.contains("getMostFollowedUser("))
+            if(s.contains("getMostFollowedUser(")) {
                 getMostFollowedUserCnt++;
-            else if (s.contains("getMostActiveUser("))
+            } else if(s.contains("getMostActiveUser(")) {
                 getMostActiveUserCnt++;
+            }
         }
-
-        assertEquals(5, createUserCnt, String.format("The 'createUser' method in the 'main' method of the 'Main' file is expected to be called 15 times, but was called %d times.", createUserCnt));
-
-        assertTrue(createPostCnt >= 3 * 5 || createPostCnt == 1, String.format("The 'createPost' method in the 'main' method of the 'Main' file is expected to be called at least 15 times (at least 3 posts for each user), but was called %d times instead.", createPostCnt, 3 * 5));
-
-        assertTrue(followCnt >= 2 * 5, String.format("The 'follow' method in the 'main' method of the 'Main' file is expected to be called at least 10 times (at least 2 followers for each user), but was called %d times instead.", followCnt, 2 * 5));
-
-        assertEquals(1, getTimelineCnt, String.format("The 'getTimeline' method in the 'main' method of the 'Main' file is expected to be called once, but is called %d times", getTimelineCnt));
-
-        assertEquals(1, getMostFollowedUserCnt, String.format("The 'getMostFollowedUser' method in the 'main' method of the 'Main' file is expected to be called once, but is called %d times", getMostFollowedUserCnt));
-
-        assertEquals(1, getMostActiveUserCnt, String.format("The 'getMostActiveUser' method in the 'main' method of the 'Main' file is expected to be called once, but is called %d times", getMostActiveUserCnt));
+        assertTrue(getMostFollowedUserCnt >= 1, String.format("The 'getMostFollowedUser' method in the 'main' method of the 'Main' file is expected to be called once, but is called %d times", getMostFollowedUserCnt));
+        assertTrue(getMostActiveUserCnt >= 1, String.format("The 'getMostActiveUser' method in the 'main' method of the 'Main' file is expected to be called once, but is called %d times", getMostActiveUserCnt));
     }
-
-
 }
