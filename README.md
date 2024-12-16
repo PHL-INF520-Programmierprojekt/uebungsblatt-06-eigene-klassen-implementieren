@@ -19,20 +19,20 @@ Die Klassen sollen im Paket `de.phl.programmingproject.socialmedia` implementier
 
 2. Erstellen Sie eine `Post`-Klasse mit den folgenden Eigenschaften:
     * `id` (int) - eine eindeutige Kennung für jeden Beitrag.
-      * _Hinweis:_ Erstellen Sie die ID im Konstruktor mit einer zusätzlichen statischen Variable zum Zählen.
+      * _Hinweis:_ Initialisieren Sie die `id` im Konstruktor mit einer zusätzlichen statischen Variable zum Zählen (z.B. `private static int ID_COUNTER`).
     * `text` (String) - der Text des Beitrags
     * `author` (User) - der/die Nutzer&ast;in, der/die den Beitrag verfasst hat
     * `timestamp` (Date) - der Zeitpunkt, zu dem der Beitrag erstellt wurde
 
 3. Fügen Sie der `User`-Klasse eine Operation namens `createPost(final String text)` hinzu, die ein neues `Post`-Objekt erstellt und es zur Liste der Beiträge für den/die Nutzer&ast;in hinzufügt. Verwenden Sie das aktuelle Datum.
 
-4. Fügen Sie der `User`-Klasse eine Operation namens `follow(final User user)` hinzu, die den/die angegebenen Nutzer&ast;in zur Liste der Nutzer&ast;innen hinzufügt, denen diese&ast;r Nutzer&ast;in folgt. Denken Sie auch daran, den/die gefolgten Nutzer&ast;in zu aktualisieren, indem Sie diese&ast;n Nutzer&at;in zum Set der Follower hinzufügen.
+4. Fügen Sie der `User`-Klasse eine Operation namens `follow(final User user)` hinzu, die den/die angegebenen Nutzer&ast;in zur Liste der Nutzer&ast;innen hinzufügt, denen diese&ast;r Nutzer&ast;in folgt. Denken Sie auch daran, den/die gefolgten Nutzer&ast;in zu aktualisieren, indem Sie diese&ast;n Nutzer&ast;in zum Set der Follower hinzufügen.
 
 5. Fügen Sie der `User`-Klasse eine Operation namens `getTimeline()` hinzu, die eine `Liste` aller Beiträge zurückgibt, die von Nutzer&ast;innen verfasst wurden, denen diese&ast;r Nutzer&ast;in folgt.
 
 6. Erstellen Sie eine `SocialMediaPlatform`-Klasse mit der folgenden Eigenschaft:
     * `users` (`Set` von User) - ein Set aller Nutzer&ast;innen auf der Plattform
-
+    * falls Sie einen eigenen Konstruktor implementieren, stellen Sie sicher, dass die Klasse auch einen leeren Konstruktor besitzt (`public SocialMediaPlatform(){...}`), da sonst die Testfälle fehlschlagen
 7. Fügen Sie der `SocialMediaPlatform`-Klasse eine Operation namens `User createUser(final String username)` hinzu, die ein neues `User`-Objekt mit dem angegebenen Benutzernamen erstellt und es zum Set der Nutzer&ast;innen auf der Plattform hinzufügt. Der/die erstellte Nutzer&ast;in wird zurückgegeben.
 
 8. Fügen Sie der `User`-Klasse eine Operation namens `getPostById(final int id)` hinzu, die das `Post`-Objekt mit der angegebenen ID zurückgibt, oder eine `NoSuchElementException` wirft, wenn kein solcher Beitrag existiert.
@@ -50,7 +50,7 @@ Die Klassen sollen im Paket `de.phl.programmingproject.socialmedia` implementier
     * lässt jede&ast;n Nutzer&ast;in mindestens 2 anderen Nutzer&ast;innen folgen
     * ruft die `getTimeline`-Operation für jede&ast;n Nutzer&ast;in auf und gibt das Ergebnis aus, indem durch die resultierenden Beiträge iteriert und der/die Nutzer&ast;in und der Text jedes Beitrags ausgegeben wird.
     * ruft die `getMostFollowedUser`-Operation auf und gibt den Namen des/der Nutzer&ast;in aus
-    * ruft die `getMostActiveUser`-Operation auf und gibt den Namen des/der Nutzer&at;in aus
+    * ruft die `getMostActiveUser`-Operation auf und gibt den Namen des/der Nutzer&ast;in aus
 
 ## Übung: Autovermietungssystem (Car Rental System)
 

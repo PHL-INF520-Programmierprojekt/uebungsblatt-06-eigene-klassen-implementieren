@@ -18,7 +18,7 @@ The classes should be implemented in the `de.phl.programmingproject.socialmedia`
     * `posts` (List of Post) - a list of posts
 
 2. Create a `Post` class with the following properties:
-    * `id` (int) - a unique identifier for each post. _Hint:_ create the ID in the constructor using an additional static variable to count.
+    * `id` (int) - a unique identifier for each post. _Hint:_ initialize the `id` in the constructor using an additional static variable to count (e.g.,`private static int ID_COUNTER`).
     * `text` (String) - the text of the post
     * `author` (User) - the user who authored the post
     * `timestamp` (Date) - the time the post was created
@@ -31,6 +31,7 @@ The classes should be implemented in the `de.phl.programmingproject.socialmedia`
 
 6. Create a `SocialMediaPlatform` class with the following property:
     * `users` (`Set` of User) - a set of all the users on the platform
+    * if you implement your own constructor, make sure that the class also has an empty constructor (`public SocialMediaPlatform(){...}`), otherwise the test cases will fail.
 
 7. Add an operation to the `SocialMediaPlatform` class called `User createUser(final String username)` that creates and returns a new `User` object with the specified username, and adds it to the set of users on the platform. The created user is returned.
 
