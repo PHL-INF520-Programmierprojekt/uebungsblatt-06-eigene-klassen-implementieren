@@ -23,7 +23,7 @@ The classes should be implemented in the `de.phl.programmingproject.socialmedia`
     * `author` (User) - the user who authored the post
     * `timestamp` (Date) - the time the post was created
 
-3. Add an operation to the `User` class called `createPost(final String text)` that creates a new `Post` object and adds it to the list of posts for the user. Use the current date.
+3. Add an operation to the `User` class called `createPost(final String text)` that creates a new `Post` object and adds it to the list of posts for the user. The operation should not have a return value (i.e. it should be declared as `void`).Use the current date.
 
 4. Add an operation to the `User` class called `follow(final User user)` that adds the specified user to the list of users being followed by this user. Keep in mind also to update the followed user by adding this user in the set of followers.
 

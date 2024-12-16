@@ -24,7 +24,7 @@ Die Klassen sollen im Paket `de.phl.programmingproject.socialmedia` implementier
     * `author` (User) - der/die Nutzer&ast;in, der/die den Beitrag verfasst hat
     * `timestamp` (Date) - der Zeitpunkt, zu dem der Beitrag erstellt wurde
 
-3. Fügen Sie der `User`-Klasse eine Operation namens `createPost(final String text)` hinzu, die ein neues `Post`-Objekt erstellt und es zur Liste der Beiträge für den/die Nutzer&ast;in hinzufügt. Verwenden Sie das aktuelle Datum.
+3. Fügen Sie der `User`-Klasse eine Operation namens `createPost(final String text)` hinzu, die ein neues `Post`-Objekt erstellt und es zur Liste der Beiträge für den/die Nutzer&ast;in hinzufügt. Die Operation soll keinen Rückgabewert besitzen (d.h. mit `void` deklariert sein). Verwenden Sie das aktuelle Datum.
 
 4. Fügen Sie der `User`-Klasse eine Operation namens `follow(final User user)` hinzu, die den/die angegebenen Nutzer&ast;in zur Liste der Nutzer&ast;innen hinzufügt, denen diese&ast;r Nutzer&ast;in folgt. Denken Sie auch daran, den/die gefolgten Nutzer&ast;in zu aktualisieren, indem Sie diese&ast;n Nutzer&ast;in zum Set der Follower hinzufügen.
 

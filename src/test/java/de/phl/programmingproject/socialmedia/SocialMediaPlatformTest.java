@@ -272,12 +272,20 @@ public class SocialMediaPlatformTest extends TestBase {
             Method createPostMethod = TestUtils.getMethod(userClass, "createPost", String.class);
             createPostMethod.invoke(user, "Post 1");
             createPostMethod.invoke(user, "Post 2");
+            // get the second post
+            Field idField = TestUtils.getField(postClass, "id");
+            Field postsField = TestUtils.getField(userClass, "posts");
+            List<?> posts = (List<?>) postsField.get(user);
+            Object expectedPost = posts.get(1);
+            int expectedId = (int) idField.get(posts.get(1));
+            // create a third post
             createPostMethod.invoke(user, "Post 3");
-            Object post = getPostByIdMethod.invoke(user, 2);
+            // get the post by id for the second post
+            Object post = getPostByIdMethod.invoke(user, expectedId);
             assertNotNull(post, "The 'getPostById' method of the 'User' class does not return a post object.");
             assertTrue(post.getClass().isAssignableFrom(postClass), "The 'getPostById' method of the 'User' class does not return a post object.");
             Field textField = TestUtils.getField(postClass, "text");
-            assertEquals("Post 3", textField.get(post), "The 'getPostById' method of the 'User' class does not return the correct post.");
+            assertEquals(expectedPost, post, "The 'getPostById' method of the 'User' class does not return the correct post.");
             assertThrows(Exception.class, () -> getPostByIdMethod.invoke(user, 4),
                     "The 'getPostById' method of the 'User' class does not throw an exception when the post does not exist.");
         } catch (Exception e) {
