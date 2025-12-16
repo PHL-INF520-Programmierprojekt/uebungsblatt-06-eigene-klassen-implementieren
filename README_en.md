@@ -3,7 +3,7 @@
 
 In this exercise sheet, you will learn to write your own Java classes (and programs) from scratch.
 
-## Exercise: Social Media Platform
+## Exercise 1: Social Media Platform
 
 You are tasked with designing a social media platform where users can create profiles, post messages, and follow other users.
 The classes should be implemented in the `de.phl.programmingproject.socialmedia` package.
@@ -52,9 +52,9 @@ The classes should be implemented in the `de.phl.programmingproject.socialmedia`
     * calls the `getMostFollowedUser` operation and prints out the user's name
     * calls the `getMostActiveUser` operation and prints out the user's name
 
-## Exercise: Car Rental System
+## Exercise 2: Car Rental System
 
-You are tasked with implementing a car rental system for a small car rental company. The system should allow customers to rent and return cars, as well as keep track of which cars are available for rent.
+You are tasked with implementing a car rental system for a small car rental company. The system should allow customers to rent and return cars, as well as keep track of which cars are available for rent. The classes should be implemented in the [`de.phl.programmingproject.carrental`](src/main/java/de/phl/programmingproject/carrental) package.
 
 ### Tasks
 

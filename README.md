@@ -3,10 +3,10 @@
 
 In diesem Übungsblatt lernen Sie, Ihre eigenen Java-Klassen (und Programme) von Grund auf zu schreiben.
 
-## Übung: Soziale Medien Plattform (Social Media Platform)
+## Übung 1: Soziale Medien Plattform (Social Media Platform)
 
 Ihre Aufgabe ist es, eine soziale Medienplattform zu entwerfen (`Social Media Platform`), auf der Nutzer&ast;innen Profile erstellen, Nachrichten posten und anderen Nutzer&ast;innen folgen können.
-Die Klassen sollen im Paket `de.phl.programmingproject.socialmedia` implementiert werden.
+Die Klassen sollen im Paket [`de.phl.programmingproject.socialmedia`](src/main/java/de/phl/programmingproject/socialmedia) implementiert werden.
 
 ### Aufgaben
 
@@ -52,9 +52,9 @@ Die Klassen sollen im Paket `de.phl.programmingproject.socialmedia` implementier
     * ruft die `getMostFollowedUser`-Operation auf und gibt den Namen des/der Nutzer&ast;in aus
     * ruft die `getMostActiveUser`-Operation auf und gibt den Namen des/der Nutzer&ast;in aus
 
-## Übung: Autovermietungssystem (Car Rental System)
+## Übung 2: Autovermietungssystem (Car Rental System)
 
-Ihre Aufgabe ist es, ein Autovermietungssystem für eine kleine Autovermietung zu implementieren. Das System sollte es Kund&ast;innen ermöglichen, Autos zu mieten und zurückzugeben, sowie zu verfolgen, welche Autos zur Vermietung verfügbar sind.
+Ihre Aufgabe ist es, ein Autovermietungssystem für eine kleine Autovermietung zu implementieren. Das System sollte es Kund&ast;innen ermöglichen, Autos zu mieten und zurückzugeben, sowie zu verfolgen, welche Autos zur Vermietung verfügbar sind. Die Klassen sollen im Paket [`de.phl.programmingproject.carrental`](src/main/java/de/phl/programmingproject/carrental) implementiert werden.
 
 ### Aufgaben
 
