@@ -3,14 +3,20 @@
   "tasks": [
     {
       "label": "INF520: Tests vorbereiten",
-      "type": "shell",
+      "type": "process",
       "command": "./gradlew",
       "windows": {
-        "command": ".\\gradlew.bat"
+        "command": "${env:ComSpec}",
+        "args": [
+          "/d",
+          "/c",
+          "gradlew.bat",
+          "prepareTestEnvironment",
+          "--console=plain"
+        ]
       },
       "args": [
         "prepareTestEnvironment",
-        "testClasses",
         "--console=plain"
       ],
       "options": {

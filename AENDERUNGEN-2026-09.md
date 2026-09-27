@@ -9,3 +9,9 @@ Der Vertrag von follow nennt Selbstfolgen, erneutes Folgen und null ausdrücklic
 Die Java-21-Konfiguration wurde lokal einschließlich Testkompilierung geprüft. Der gemeinsame Testweg wurde in VS Code 1.132.0 mit Test Runner for Java 0.46.0 über Run Tests und Debug Tests geprüft. Fachliche Änderungen wurden gegen private Referenzimplementierungen und gezielt fehlerhafte Varianten geprüft. Musterlösungen wurden nicht in dieses Aufgabenrepository übernommen.
 
 Noch unbearbeitete Aufgaben können fachlich rote Tests ergeben. Bei bestehenden Codespaces ist nach der Konfigurationsänderung ein Container-Rebuild erforderlich. Bereits ausgegebene Abgaben erhalten Änderungen nicht automatisch; vor einer Übernahme muss ihr Bearbeitungsstand berücksichtigt werden.
+
+## Ergänzende Qualitätsprüfung
+
+Die Dev Container verwenden Java 21 auf Debian 12 (`3-21-bookworm`). Die Java-Erweiterung und der JDK-Pfad sind einheitlich gesetzt. Die VS-Code-Vorbereitung stellt ausschließlich den Mockito-Agenten bereit; unter Windows startet sie unabhängig vom Terminalprofil über `cmd.exe`. Hinweise zu Compilerfehlern und Projektpfaden stehen in [TESTEN.md](TESTEN.md).
+
+User-Testobjekte entstehen über createUser statt über angenommene Konstruktorsignaturen. Timeline-Tests prüfen eigene, fremde und mehrfach vorkommende Beiträge. Die main-Prüfung verwendet kontrollierte Rückgaben, um Timeline- und Statistikausgaben unabhängig vom Format nachzuweisen. Die Testvoraussetzungen und der englische follow-Vertrag sind dokumentiert.

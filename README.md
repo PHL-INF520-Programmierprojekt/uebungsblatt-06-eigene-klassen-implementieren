@@ -10,6 +10,8 @@ Die Klassen sollen im Paket [`de.phl.programmingproject.socialmedia`](src/main/j
 
 ### Aufgaben
 
+**Testvoraussetzung:** Die `User`-Konstruktoren sind frei wählbar. Die Tests erzeugen Nutzer über `SocialMediaPlatform.createUser(String)`; implementieren Sie deshalb auch die Plattform aus Aufgaben 6 und 7, bevor Sie die Verhaltenstests für `User` ausführen. Aufgabe 12 verwendet kontrollierte Rückgaben mit eindeutigen Namen und Texten, um die Ausgabe der Timeline und der beiden Statistiken unabhängig vom Ausgabeformat zu prüfen.
+
 1. Erstellen Sie eine `User`-Klasse mit den folgenden Eigenschaften:
     * `id` (int) - eine eindeutige Kennung für jed&ast;n Nutzer&ast;in
     * `username` (String) - der gewählte Benutzername

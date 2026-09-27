@@ -18,3 +18,9 @@ Java-Quellen, Tests und erfasste Ausgaben verwenden ausdrücklich UTF-8. Deutsch
 Außerhalb des Dev Containers müssen sowohl der Java-Projektimport als auch das Terminal ein JDK 21 verwenden. Setzen Sie dazu `JAVA_HOME` auf Ihr installiertes JDK 21 und nehmen Sie dessen `bin`-Ordner in `PATH` auf. Starten Sie VS Code danach neu. Prüfen Sie im Terminal `java -version` und `./gradlew --version` (Windows: `.\gradlew.bat --version`). Eine Editor-Einstellung wie `java.import.gradle.java.home` allein ändert das Terminal-Java nicht.
 
 Nach einem Update der Gradle-Abhängigkeiten in VS Code **Java: Reload Projects** ausführen. Engine, API und Launcher sind über die JUnit-BOM 5.14.4 aufeinander abgestimmt. Die Vorlage wurde mit Test Runner for Java 0.46.0 im normalen und im Debug-Testlauf geprüft.
+
+Die Vorbereitungsaufgabe lädt ausschließlich den Mockito-Agenten; sie kompiliert keine Aufgaben oder Tests. Compilerfehler können weiterhin den Java-Sprachserver bzw. betroffene Tests behindern. Unter Windows startet die Aufgabe ausdrücklich über `cmd.exe` und funktioniert dadurch auch bei Git Bash als Standardterminal.
+
+**Projektpfad unter Windows:** Verwenden Sie möglichst einen Pfad ohne Umlaute oder andere Sonderzeichen, beispielsweise `C:\Java\INF520`. In Pfaden mit Umlauten wurden Fehler beim Start der Gradle-Test-JVM beobachtet. Leerzeichen sind zulässig. Diese Einschränkung betrifft den Ordnerpfad, nicht Umlaute in Java-Quelltexten oder Ausgaben.
+
+**Compilerfehler in anderen Aufgaben:** Die Java-Erweiterung kann unabhängig von der Vorbereitungsaufgabe „Build failed, do you want to continue?“ anzeigen. In der geprüften VS-Code-Konfiguration konnten nicht betroffene Tests nach **Continue** ausgeführt werden. Nutzen Sie dies nur für bereits kompilierbare Teilaufgaben; beheben Sie vor einem vollständigen Gradle-Lauf alle Compilerfehler. Ein Fortsetzen repariert keine fehlerhaften Klassen.

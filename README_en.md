@@ -10,6 +10,8 @@ The classes should be implemented in the `de.phl.programmingproject.socialmedia`
 
 ### Tasks
 
+**Test prerequisite:** The `User` constructor signature is your choice. Tests create users through `SocialMediaPlatform.createUser(String)`, so implement tasks 6 and 7 before running the `User` behavior tests. Task 12 uses controlled return values with distinct names/texts to check timeline and statistics output without requiring a particular format.
+
 1. Create a `User` class with the following properties:
     * `id` (int) - a unique identifier for each user
     * `username` (String) - the user's chosen username
@@ -26,6 +28,8 @@ The classes should be implemented in the `de.phl.programmingproject.socialmedia`
 3. Add an operation to the `User` class called `createPost(final String text)` that creates a new `Post` object and adds it to the list of posts for the user. The operation should not have a return value (i.e. it should be declared as `void`).Use the current date.
 
 4. Add an operation to the `User` class called `follow(final User user)` that adds the specified user to the list of users being followed by this user. Keep in mind also to update the followed user by adding this user in the set of followers.
+
+   **Contract:** `follow` throws `IllegalArgumentException` for `null`, self-following or following the same user again. A rejected call changes neither set. A successful call updates both `following` and the other user’s `followers`.
 
 5. Add an operation to the `User` class called `getTimeline()` that returns a `List` of all the posts authored by users that this user is following.
 

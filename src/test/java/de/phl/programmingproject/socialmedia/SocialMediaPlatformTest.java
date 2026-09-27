@@ -6,9 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
-import org.mockito.invocation.Invocation;
+import org.mockito.stubbing.Answer;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SocialMediaPlatformTest extends TestBase {
 
 
-    private static int USER_CNT;
+    private int userCount;
+    private Object fixturePlatform;
 
     Class<?> userClass;
 
@@ -38,46 +38,25 @@ public class SocialMediaPlatformTest extends TestBase {
     }
 
     Object createUserObject() {
-        Object userObject = null;
-        for (Constructor constructor : userClass.getDeclaredConstructors()) {
-            if (constructor.getParameterCount() == 0) {
-                try {
-                    return constructor.newInstance();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            } else if (constructor.getParameterCount() == 1 &&
-                    constructor.getParameterTypes()[0] == String.class) {
-                try {
-                    return constructor.newInstance("Test User " + USER_CNT++);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            } else if (constructor.getParameterCount() == 2 &&
-                    constructor.getParameterTypes()[0] == int.class &&
-                    constructor.getParameterTypes()[1] == String.class) {
-                try {
-                    return constructor.newInstance(USER_CNT++, "Test User " + USER_CNT);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        // Ausschließlich die vorgegebene Fabrik verwenden: Die Signatur des
+        // User-Konstruktors ist frei. Eine Plattform pro Test vermeidet doppelte IDs.
+        if (fixturePlatform == null) fixturePlatform = createSocialMediaPlatformObject();
+        try {
+            Object user = TestUtils.getMethod(getSocialMediaPlatformClass(), "createUser", String.class)
+                    .invoke(fixturePlatform, "Testperson " + userCount++);
+            assertNotNull(user, "Implementieren Sie createUser aus Aufgabe 7 als Testvoraussetzung.");
+            return user;
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError("Testperson konnte über createUser (Aufgabe 7) nicht erzeugt werden.", e);
         }
-        return userObject;
     }
 
     Object createSocialMediaPlatformObject() {
-        Object socialMediaPlatformObject = null;
-        for (Constructor constructor : getSocialMediaPlatformClass().getDeclaredConstructors()) {
-            if (constructor.getParameterCount() == 0) {
-                try {
-                    socialMediaPlatformObject = constructor.newInstance();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        try {
+            return getSocialMediaPlatformClass().getConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError("SocialMediaPlatform benötigt den vorgegebenen öffentlichen, parameterlosen Konstruktor.", e);
         }
-        return socialMediaPlatformObject;
     }
 
     @BeforeEach
@@ -176,25 +155,31 @@ public class SocialMediaPlatformTest extends TestBase {
     }
 
     @Test
-    void task_5_User_class_implements_getTimeline() {
+    void task_5_User_class_implements_getTimeline() throws ReflectiveOperationException {
         TestUtils.assertClassHasMethod(userClass, "getTimeline", List.class);
-
-        // create two users, user1 follows user2 and user2 creates a post.
-        Method getTimelineMethod = TestUtils.getMethod(userClass, "getTimeline");
-        Method followMethod = TestUtils.getMethod(userClass, "follow", userClass);
-        Method createPostMethod = TestUtils.getMethod(userClass, "createPost", String.class);
-
+        Method timeline = TestUtils.getMethod(userClass, "getTimeline");
+        Method follow = TestUtils.getMethod(userClass, "follow", userClass);
+        Method createPost = TestUtils.getMethod(userClass, "createPost", String.class);
+        Field posts = TestUtils.getField(userClass, "posts");
         Object user = createUserObject();
-        Object otherUser = createUserObject();
-
-        try {
-            followMethod.invoke(user, otherUser);
-            createPostMethod.invoke(otherUser, "Post 1");
-            List<?> posts = (List<?>) getTimelineMethod.invoke(user);
-            assertEquals(1, posts.size(), "The 'getTimeline' method of the 'User' class does not return the correct number of posts.");
-        } catch (Exception e) {
-            System.err.println(e);
-            fail("Failed to create the post and add it to the list of posts. \n" + e);
+        Object first = createUserObject();
+        Object second = createUserObject();
+        Object outsider = createUserObject();
+        createPost.invoke(user, "Eigener Beitrag gehört nicht in die Timeline");
+        createPost.invoke(outsider, "Nicht gefolgter Person gehört nicht in die Timeline");
+        assertTrue(((List<?>) timeline.invoke(user)).isEmpty(), "Ohne gefolgte Personen ist die Timeline leer.");
+        follow.invoke(user, first);
+        follow.invoke(user, second);
+        createPost.invoke(first, "Erster Beitrag");
+        createPost.invoke(first, "Zweiter Beitrag");
+        createPost.invoke(second, "Dritter Beitrag");
+        List<Object> expected = new ArrayList<>((List<?>) posts.get(first));
+        expected.addAll((List<?>) posts.get(second));
+        List<?> actual = (List<?>) timeline.invoke(user);
+        assertEquals(expected.size(), actual.size(), "Die Timeline enthält genau die Beiträge der gefolgten Personen.");
+        for (Object post : expected) {
+            assertEquals(1L, actual.stream().filter(candidate -> candidate == post).count(),
+                    "Jeder Beitrag der gefolgten Personen muss genau einmal vorkommen; die Reihenfolge ist frei.");
         }
     }
 
@@ -220,7 +205,7 @@ public class SocialMediaPlatformTest extends TestBase {
             Object socialMediaPlatform = createSocialMediaPlatformObject();
             Object user = createUserMethod.invoke(socialMediaPlatform, "Test");
             assertNotNull(user, "The 'createUser' method of the 'SocialMediaPlatform' class does not return a user object.");
-            assertTrue(user.getClass().isAssignableFrom(userClass), "The 'createUser' method of the 'SocialMediaPlatform' class does not return a user object.");
+            assertTrue(userClass.isInstance(user), "The 'createUser' method of the 'SocialMediaPlatform' class does not return a user object.");
             Field nameField = TestUtils.getField(userClass, "username");
             assertEquals("Test", nameField.get(user), "The 'createUser' method of the 'SocialMediaPlatform' class does not set the username of the user correctly.");
             assertEquals(1, ((Set<?>) usersField.get(socialMediaPlatform)).size(), "The 'createUser' method of the 'SocialMediaPlatform' class does not add the user to the set of users.");
@@ -252,7 +237,7 @@ public class SocialMediaPlatformTest extends TestBase {
             // get the post by id for the second post
             Object post = getPostByIdMethod.invoke(user, expectedId);
             assertNotNull(post, "The 'getPostById' method of the 'User' class does not return a post object.");
-            assertTrue(post.getClass().isAssignableFrom(postClass), "The 'getPostById' method of the 'User' class does not return a post object.");
+            assertTrue(postClass.isInstance(post), "The 'getPostById' method of the 'User' class does not return a post object.");
             Field textField = TestUtils.getField(postClass, "text");
             assertEquals(expectedPost, post, "The 'getPostById' method of the 'User' class does not return the correct post.");
             int missingPostId = unusedId(posts, postClass);
@@ -280,7 +265,7 @@ public class SocialMediaPlatformTest extends TestBase {
             Object userObject = getUserByIdMethod.invoke(socialMediaPlatform, expectedId);
             assertSame(expectedUser, userObject);
             assertNotNull(userObject, "The 'getUserById' method of the 'SocialMediaPlatform' class does not return a user object.");
-            assertTrue(userObject.getClass().isAssignableFrom(userClass), "The 'getUserById' method of the 'SocialMediaPlatform' class does not return a user object.");
+            assertTrue(userClass.isInstance(userObject), "The 'getUserById' method of the 'SocialMediaPlatform' class does not return a user object.");
             Field nameField = TestUtils.getField(userClass, "username");
             assertEquals("User 3", nameField.get(userObject), "The 'getUserById' method of the 'SocialMediaPlatform' class does not return the correct user.");
             Set<?> registered = (Set<?>) TestUtils.getField(socialMediaPlatformClass, "users").get(socialMediaPlatform);
@@ -361,8 +346,9 @@ public class SocialMediaPlatformTest extends TestBase {
 
         // Echte Konstruktoren initialisieren den Zustand. Methoden laufen auf dem
         // beobachteten Objekt real weiter; IDs, Collections und Rückgaben bleiben erhalten.
-        try (MockedConstruction<?> users = observeConstruction(userClass);
-             MockedConstruction<?> platforms = observeConstruction(platformClass)) {
+        OutputProbe probe = new OutputProbe();
+        try (MockedConstruction<?> users = observeConstruction(userClass, probe.answer());
+             MockedConstruction<?> platforms = observeConstruction(platformClass, probe.answer())) {
             String output = TestUtils.runActionAndGetSystemOut(() -> Main.main(new String[0]));
             assertEquals(1, platforms.constructed().size(), "Erzeugen Sie eine Plattform.");
             Object platform = platforms.constructed().getFirst();
@@ -377,18 +363,10 @@ public class SocialMediaPlatformTest extends TestBase {
                 assertFalse(following.contains(user), "Eine Person darf sich nicht selbst folgen.");
                 assertTrue(registered.containsAll(following), "Folgen Sie Personen derselben Plattform.");
                 assertCalled(user, "getTimeline");
-                for (Object followed : following) {
-                    List<?> timelinePosts = (List<?>) TestUtils.getField(userClass, "posts").get(followed);
-                    String name = (String) TestUtils.getField(userClass, "username").get(followed);
-                    assertTrue(output.contains(name), "Geben Sie die Namen der Verfassenden in der Timeline aus.");
-                    for (Object post : timelinePosts) {
-                        String text = (String) TestUtils.getField(getPostClass(), "text").get(post);
-                        assertTrue(output.contains(text), "Geben Sie die Texte der Timeline-Beiträge aus.");
-                    }
-                }
             }
             assertCalled(platform, "getMostFollowedUser");
             assertCalled(platform, "getMostActiveUser");
+            probe.assertPrinted(output);
         }
     }
 
@@ -398,21 +376,100 @@ public class SocialMediaPlatformTest extends TestBase {
                 "Rufen Sie " + method + " für das erforderliche Objekt auf.");
     }
 
-    private static <T> MockedConstruction<T> observeConstruction(Class<T> type) {
-        return Mockito.mockConstruction(type, Mockito.withSettings().defaultAnswer(Mockito.CALLS_REAL_METHODS),
+    /**
+     * Aufgabe 12 prüft den Umgang mit Rückgaben, unabhängig vom Ausgabeformat.
+     * Kontrollierte Kopien tragen eindeutige Texte/Namen: Die bloße Ausgabe der
+     * eigenen Beiträge oder ein ungenutzter Statistikaufruf kann so nicht bestehen.
+     * Originalzustand und Konstruktoren bleiben erhalten. Fachliche Rückgaben der
+     * Methoden selbst werden separat in Aufgaben 5, 10 und 11 geprüft.
+     */
+    private static final class OutputProbe {
+        private final Map<Object, Map<Object, Object>> timelineCopies = new IdentityHashMap<>();
+        private final Map<String, Map<Object, Object>> statisticCopies = new HashMap<>();
+        private final Set<String> requiredOutput = new LinkedHashSet<>();
+        private int sequence;
+
+        private String marker(String kind, Object original) {
+            String token = "[INF520-" + kind + "-" + sequence++ + "]";
+            requiredOutput.add(token);
+            return token + " " + original;
+        }
+
+        Answer<Object> answer() {
+            return invocation -> {
+                Object result = invocation.callRealMethod();
+                String name = invocation.getMethod().getName();
+                if (name.equals("getTimeline") && invocation.getArguments().length == 0) {
+                    assertInstanceOf(List.class, result, "getTimeline muss eine Liste zurückgeben.");
+                    Map<Object, Object> copies = timelineCopies.computeIfAbsent(invocation.getMock(), key -> new IdentityHashMap<>());
+                    List<Object> controlled = new ArrayList<>();
+                    for (Object post : (List<?>) result) {
+                        if (!copies.containsKey(post)) {
+                            Object copy = copyObject(post);
+                            Field text = TestUtils.getField(getPostClass(), "text");
+                            text.set(copy, marker("Beitrag", text.get(post)));
+                            Field author = TestUtils.getField(getPostClass(), "author");
+                            Object authorCopy = copyObject(author.get(post));
+                            Field username = TestUtils.getField(authorCopy.getClass(), "username");
+                            username.set(authorCopy, marker("Verfasser", username.get(authorCopy)));
+                            author.set(copy, authorCopy);
+                            copies.put(post, copy);
+                        }
+                        controlled.add(copies.get(post));
+                    }
+                    return controlled;
+                }
+                if ((name.equals("getMostFollowedUser") || name.equals("getMostActiveUser"))
+                        && invocation.getArguments().length == 0) {
+                    assertNotNull(result, "Die Statistik muss eine Person zurückgeben.");
+                    Map<Object, Object> copies = statisticCopies.computeIfAbsent(name, key -> new IdentityHashMap<>());
+                    if (!copies.containsKey(result)) {
+                        Object copy = copyObject(result);
+                        Field username = TestUtils.getField(copy.getClass(), "username");
+                        username.set(copy, marker(name, username.get(copy)));
+                        copies.put(result, copy);
+                    }
+                    return copies.get(result);
+                }
+                return result;
+            };
+        }
+
+        void assertPrinted(String output) {
+            assertFalse(requiredOutput.isEmpty(), "Geben Sie die Timeline und die Statistiken aus.");
+            for (String token : requiredOutput) {
+                assertTrue(output.contains(token), "Geben Sie die Texte und Namen aus den Rückgaben von getTimeline, "
+                        + "getMostFollowedUser und getMostActiveUser aus. Es fehlt: " + token);
+            }
+        }
+    }
+
+    private static Object copyObject(Object original) throws IllegalAccessException {
+        assertNotNull(original, "Beiträge und ihre Verfassenden dürfen nicht null sein.");
+        // Mockito instanziiert ohne zusätzlichen Konstruktoraufruf; private/finale
+        // Felder werden wie beim beobachteten Konstruktor aus dem Original übernommen.
+        Object copy = Mockito.mock(original.getClass(), Mockito.CALLS_REAL_METHODS);
+        copyFields(original, copy);
+        return copy;
+    }
+
+    private static void copyFields(Object original, Object target) throws IllegalAccessException {
+        for (Class<?> current = original.getClass(); current != Object.class; current = current.getSuperclass()) {
+            for (Field field : current.getDeclaredFields()) {
+                if (!Modifier.isStatic(field.getModifiers())) {
+                    field.setAccessible(true);
+                    field.set(target, field.get(original));
+                }
+            }
+        }
+    }
+
+    private static <T> MockedConstruction<T> observeConstruction(Class<T> type, Answer<Object> answer) {
+        return Mockito.mockConstruction(type, Mockito.withSettings().defaultAnswer(answer),
                 (mock, context) -> {
-                    // Während der Initialisierung wird dieser verschachtelte Konstruktor
-                    // nicht erneut gemockt. Dadurch bleiben auch eigene Konstruktorvarianten nutzbar.
                     context.constructor().setAccessible(true);
                     Object initialized = context.constructor().newInstance(context.arguments().toArray());
-                    for (Class<?> current = type; current != Object.class; current = current.getSuperclass()) {
-                        for (Field field : current.getDeclaredFields()) {
-                            if (!Modifier.isStatic(field.getModifiers())) {
-                                field.setAccessible(true);
-                                field.set(mock, field.get(initialized));
-                            }
-                        }
-                    }
+                    copyFields(initialized, mock);
                 });
     }
 
