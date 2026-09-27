@@ -28,6 +28,8 @@ Die Klassen sollen im Paket [`de.phl.programmingproject.socialmedia`](src/main/j
 
 4. Fügen Sie der `User`-Klasse eine Operation namens `follow(final User user)` hinzu, die den/die angegebenen Nutzer&ast;in zur Liste der Nutzer&ast;innen hinzufügt, denen diese&ast;r Nutzer&ast;in folgt. Denken Sie auch daran, den/die gefolgten Nutzer&ast;in zu aktualisieren, indem Sie diese&ast;n Nutzer&ast;in zum Set der Follower hinzufügen.
 
+   **Vertrag:** `follow` wirft eine `IllegalArgumentException`, wenn das Argument `null` ist, die Person sich selbst folgen möchte oder dieser Person bereits folgt. Ein abgewiesener Aufruf verändert keine der beiden Mengen. Bei einem gültigen Aufruf müssen `following` und `followers` dieselbe Beziehung aus ihren jeweiligen Perspektiven abbilden.
+
 5. Fügen Sie der `User`-Klasse eine Operation namens `getTimeline()` hinzu, die eine `Liste` aller Beiträge zurückgibt, die von Nutzer&ast;innen verfasst wurden, denen diese&ast;r Nutzer&ast;in folgt.
 
 6. Erstellen Sie eine `SocialMediaPlatform`-Klasse mit der folgenden Eigenschaft:

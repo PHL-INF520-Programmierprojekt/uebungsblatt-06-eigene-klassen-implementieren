@@ -2,7 +2,6 @@ package de.phl.programmingproject.socialmedia;
 
 import de.phl.programmingproject.TestBase;
 import de.phl.programmingproject.TestUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
@@ -12,6 +11,8 @@ import org.mockito.invocation.Invocation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,14 +42,14 @@ public class SocialMediaPlatformTest extends TestBase {
         for (Constructor constructor : userClass.getDeclaredConstructors()) {
             if (constructor.getParameterCount() == 0) {
                 try {
-                    userObject = constructor.newInstance();
+                    return constructor.newInstance();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (constructor.getParameterCount() == 1 &&
                     constructor.getParameterTypes()[0] == String.class) {
                 try {
-                    userObject = constructor.newInstance("Test User");
+                    return constructor.newInstance("Test User " + USER_CNT++);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -56,7 +57,7 @@ public class SocialMediaPlatformTest extends TestBase {
                     constructor.getParameterTypes()[0] == int.class &&
                     constructor.getParameterTypes()[1] == String.class) {
                 try {
-                    userObject = constructor.newInstance(USER_CNT++, "Test User");
+                    return constructor.newInstance(USER_CNT++, "Test User " + USER_CNT);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -83,34 +84,6 @@ public class SocialMediaPlatformTest extends TestBase {
     void setup() {
         userClass = TestUtils.getClassForName("User",
                 "de.phl.programmingproject.socialmedia");
-    }
-
-    @AfterEach
-    void tearDown() {
-        // reset static fields of User and Post class
-        if (userClass != null) {
-            resetStaticFields(userClass, 0);
-        }
-
-        try {
-            Class<?> postClass = Class.forName("de.phl.programmingproject.socialmedia.Post");
-            resetStaticFields(postClass, 0);
-        } catch (ClassNotFoundException e) {
-            System.out.println("Post class not yet implemented!");
-        }
-    }
-
-    private static void resetStaticFields(Class clazz, Object defaultValue) {
-        for (Field field : clazz.getDeclaredFields()) {
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
-                try {
-                    field.setAccessible(true);
-                    field.set(null, defaultValue);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
     }
 
     @Test
@@ -175,36 +148,32 @@ public class SocialMediaPlatformTest extends TestBase {
     }
 
     @Test
-    void task_4_User_class_implements_follow() {
+    void task_4_User_class_implements_follow() throws ReflectiveOperationException {
         TestUtils.assertClassHasMethod(userClass, "follow", void.class, userClass);
+        Method follow = TestUtils.getMethod(userClass, "follow", userClass);
+        Object user = createUserObject();
+        Object other = createUserObject();
+        Field following = TestUtils.getField(userClass, "following");
+        Field followers = TestUtils.getField(userClass, "followers");
 
-        Method followMethod = TestUtils.getMethod(userClass, "follow", userClass);
-
-        Object userObject = createUserObject();
-        Object otherUser = createUserObject();
-
-        Field followingField = TestUtils.getField(userClass, "following");
-        Field followersField = TestUtils.getField(userClass, "followers");
-        try {
-            Set<?> following = (Set<?>) followingField.get(userObject);
-            assertEquals(0, following.size());
-            followMethod.invoke(userObject, otherUser);
-            assertEquals(1, following.size(), "The 'follow' method of the 'User' class does not add the user to the list of following users.");
-            assertEquals(1, ((Set<?>) followersField.get(otherUser)).size(), "The 'follow' method of the 'User' class does not add the user to the list of followers of the other user.");
-
-            assertThrows(Exception.class, () -> followMethod.invoke(userObject, userObject),
-                    "The 'follow' method of the 'User' class does not throw an exception when the user tries to follow itself.");
-
-            assertThrows(Exception.class, () -> followMethod.invoke(userObject, otherUser),
-                    "The 'follow' method of the 'User' class does not throw an exception when the user tries to follow a user that he/she is already following.");
-
-        } catch (Exception e) {
-            System.err.println(e);
-            fail("Failed to follow another user. \n" + e);
+        follow.invoke(user, other);
+        assertEquals(Set.of(other), following.get(user), "following muss die gefolgte Person enthalten.");
+        assertEquals(Set.of(user), followers.get(other), "Die andere Person muss den Follower erhalten.");
+        for (Object invalid : new Object[]{user, other, null}) {
+            assertThrows(IllegalArgumentException.class, () -> invokeUnwrapped(follow, user, invalid),
+                    "Selbstfolgen, erneutes Folgen und null müssen eine IllegalArgumentException auslösen.");
+            assertEquals(Set.of(other), following.get(user), "Ein abgewiesener Aufruf darf following nicht verändern.");
+            assertEquals(Set.of(user), followers.get(other), "Ein abgewiesener Aufruf darf followers nicht verändern.");
         }
-
     }
 
+    private static Object invokeUnwrapped(Method method, Object target, Object... arguments) throws Throwable {
+        try {
+            return method.invoke(target, arguments);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+    }
 
     @Test
     void task_5_User_class_implements_getTimeline() {
@@ -286,7 +255,8 @@ public class SocialMediaPlatformTest extends TestBase {
             assertTrue(post.getClass().isAssignableFrom(postClass), "The 'getPostById' method of the 'User' class does not return a post object.");
             Field textField = TestUtils.getField(postClass, "text");
             assertEquals(expectedPost, post, "The 'getPostById' method of the 'User' class does not return the correct post.");
-            assertThrows(Exception.class, () -> getPostByIdMethod.invoke(user, 4),
+            int missingPostId = unusedId(posts, postClass);
+            assertThrows(NoSuchElementException.class, () -> invokeUnwrapped(getPostByIdMethod, user, missingPostId),
                     "The 'getPostById' method of the 'User' class does not throw an exception when the post does not exist.");
         } catch (Exception e) {
             System.err.println(e);
@@ -305,13 +275,17 @@ public class SocialMediaPlatformTest extends TestBase {
             Object socialMediaPlatform = createSocialMediaPlatformObject();
             createUserMethod.invoke(socialMediaPlatform, "User 1");
             createUserMethod.invoke(socialMediaPlatform, "User 2");
-            createUserMethod.invoke(socialMediaPlatform, "User 3");
-            Object userObject = getUserByIdMethod.invoke(socialMediaPlatform, 2);
+            Object expectedUser = createUserMethod.invoke(socialMediaPlatform, "User 3");
+            int expectedId = (int) TestUtils.getField(userClass, "id").get(expectedUser);
+            Object userObject = getUserByIdMethod.invoke(socialMediaPlatform, expectedId);
+            assertSame(expectedUser, userObject);
             assertNotNull(userObject, "The 'getUserById' method of the 'SocialMediaPlatform' class does not return a user object.");
             assertTrue(userObject.getClass().isAssignableFrom(userClass), "The 'getUserById' method of the 'SocialMediaPlatform' class does not return a user object.");
             Field nameField = TestUtils.getField(userClass, "username");
             assertEquals("User 3", nameField.get(userObject), "The 'getUserById' method of the 'SocialMediaPlatform' class does not return the correct user.");
-            assertThrows(Exception.class, () -> getUserByIdMethod.invoke(socialMediaPlatform, 4),
+            Set<?> registered = (Set<?>) TestUtils.getField(socialMediaPlatformClass, "users").get(socialMediaPlatform);
+            int missingUserId = unusedId(registered, userClass);
+            assertThrows(NoSuchElementException.class, () -> invokeUnwrapped(getUserByIdMethod, socialMediaPlatform, missingUserId),
                     "The 'getUserById' method of the 'SocialMediaPlatform' class does not throw an exception when the user does not exist.");
         } catch (Exception e) {
             System.err.println(e);
@@ -380,52 +354,75 @@ public class SocialMediaPlatformTest extends TestBase {
     }
 
     @Test
-    void task_12_main_method_implemented() {
-        Class<?> userClass = TestUtils.getClassForName("User", "de.phl.programmingproject.socialmedia");
+    void task_12_main_method_implemented() throws ReflectiveOperationException {
+        Class<?> platformClass = getSocialMediaPlatformClass();
+        assertNotNull(userClass, "Implementieren Sie zuerst User.");
+        assertNotNull(platformClass, "Implementieren Sie zuerst SocialMediaPlatform.");
 
-        /*
-         * creates a new `SocialMediaPlatform` object
-         * creates at least 5 `User` objects and adds them to the platform
-         * has each user create at least 3 posts
-         * has each user follow at least 2 other users
-         * calls the `getTimeline` operation for each user and prints out the result by iterating through the resulting posts and printing each post's user and text.
-         * calls the `getMostFollowedUser` operation and prints out the user's name
-         * calls the `getMostActiveUser` operation and prints out the user's name
-         */
-
-        try (MockedConstruction<?> mockedUserConstruction = Mockito.mockConstruction(userClass)) {
-            Main.main(new String[]{});
-
-            assertEquals(5, mockedUserConstruction.constructed().size(), "The 'createUser' method in the 'main' method of the 'Main' file is expected to be called 5 times.");
-
-            for (Object usr : mockedUserConstruction.constructed()) {
-                Collection<Invocation> invocations = Mockito.mockingDetails(usr).getInvocations();
-
-                long createPostCnt = invocations.stream().filter(inv -> inv.getMethod().getName().equals("createPost")).count();
-                assertTrue(createPostCnt >= 3, String.format("The 'createPost' method is expected to be called at least 3 times per user, but was called %d times.", createPostCnt));
-
-                long followCnt = invocations.stream().filter(inv -> inv.getMethod().getName().equals("follow")).count();
-                assertTrue(followCnt >= 2, String.format("The 'follow' method is expected to be called at least 2 times per user, but was called %d times.", followCnt));
-
-                long getTimelineCnt = invocations.stream().filter(inv -> inv.getMethod().getName().equals("getTimeline")).count();
-                assertTrue(getTimelineCnt >= 1, String.format("The 'getTimeline' method is expected to be called at least once per user, but was called %d times.", getTimelineCnt));
+        // Echte Konstruktoren initialisieren den Zustand. Methoden laufen auf dem
+        // beobachteten Objekt real weiter; IDs, Collections und Rückgaben bleiben erhalten.
+        try (MockedConstruction<?> users = observeConstruction(userClass);
+             MockedConstruction<?> platforms = observeConstruction(platformClass)) {
+            String output = TestUtils.runActionAndGetSystemOut(() -> Main.main(new String[0]));
+            assertEquals(1, platforms.constructed().size(), "Erzeugen Sie eine Plattform.");
+            Object platform = platforms.constructed().getFirst();
+            Set<?> registered = (Set<?>) TestUtils.getField(platformClass, "users").get(platform);
+            assertTrue(registered.size() >= 5, "Registrieren Sie mindestens fünf Nutzerinnen oder Nutzer.");
+            for (Object user : registered) {
+                assertTrue(Mockito.mockingDetails(user).isMock(), "Erzeugen Sie die Nutzer innerhalb von main.");
+                List<?> posts = (List<?>) TestUtils.getField(userClass, "posts").get(user);
+                assertTrue(posts.size() >= 3, "Jede Person benötigt mindestens drei Beiträge.");
+                Set<?> following = (Set<?>) TestUtils.getField(userClass, "following").get(user);
+                assertTrue(following.size() >= 2, "Jede Person muss mindestens zwei verschiedenen Personen folgen.");
+                assertFalse(following.contains(user), "Eine Person darf sich nicht selbst folgen.");
+                assertTrue(registered.containsAll(following), "Folgen Sie Personen derselben Plattform.");
+                assertCalled(user, "getTimeline");
+                for (Object followed : following) {
+                    List<?> timelinePosts = (List<?>) TestUtils.getField(userClass, "posts").get(followed);
+                    String name = (String) TestUtils.getField(userClass, "username").get(followed);
+                    assertTrue(output.contains(name), "Geben Sie die Namen der Verfassenden in der Timeline aus.");
+                    for (Object post : timelinePosts) {
+                        String text = (String) TestUtils.getField(getPostClass(), "text").get(post);
+                        assertTrue(output.contains(text), "Geben Sie die Texte der Timeline-Beiträge aus.");
+                    }
+                }
             }
-        } catch (Exception e) {
-            fail("Failed to verify the main method implementation. \n" + e);
+            assertCalled(platform, "getMostFollowedUser");
+            assertCalled(platform, "getMostActiveUser");
         }
+    }
 
-        // verify that the getMostFollowedUser and getMostActiveUser methods are called
-        String content = TestUtils.getFileContentForFileInRootOrSrcDirectory("main/java/de/phl/programmingproject/socialmedia/Main.java");
-        int getMostFollowedUserCnt = 0;
-        int getMostActiveUserCnt = 0;
-        for (String s : content.split("\n")) {
-            if(s.contains("getMostFollowedUser(")) {
-                getMostFollowedUserCnt++;
-            } else if(s.contains("getMostActiveUser(")) {
-                getMostActiveUserCnt++;
-            }
-        }
-        assertTrue(getMostFollowedUserCnt >= 1, String.format("The 'getMostFollowedUser' method in the 'main' method of the 'Main' file is expected to be called once, but is called %d times", getMostFollowedUserCnt));
-        assertTrue(getMostActiveUserCnt >= 1, String.format("The 'getMostActiveUser' method in the 'main' method of the 'Main' file is expected to be called once, but is called %d times", getMostActiveUserCnt));
+    private static void assertCalled(Object object, String method) {
+        assertTrue(Mockito.mockingDetails(object).getInvocations().stream()
+                .anyMatch(invocation -> invocation.getMethod().getName().equals(method)),
+                "Rufen Sie " + method + " für das erforderliche Objekt auf.");
+    }
+
+    private static <T> MockedConstruction<T> observeConstruction(Class<T> type) {
+        return Mockito.mockConstruction(type, Mockito.withSettings().defaultAnswer(Mockito.CALLS_REAL_METHODS),
+                (mock, context) -> {
+                    // Während der Initialisierung wird dieser verschachtelte Konstruktor
+                    // nicht erneut gemockt. Dadurch bleiben auch eigene Konstruktorvarianten nutzbar.
+                    context.constructor().setAccessible(true);
+                    Object initialized = context.constructor().newInstance(context.arguments().toArray());
+                    for (Class<?> current = type; current != Object.class; current = current.getSuperclass()) {
+                        for (Field field : current.getDeclaredFields()) {
+                            if (!Modifier.isStatic(field.getModifiers())) {
+                                field.setAccessible(true);
+                                field.set(mock, field.get(initialized));
+                            }
+                        }
+                    }
+                });
+    }
+
+    // Auch eine zulässige ID-Folge mit anderem Startwert darf bestehen.
+    private static int unusedId(Collection<?> objects, Class<?> type) throws IllegalAccessException {
+        Set<Integer> ids = new HashSet<>();
+        Field field = TestUtils.getField(type, "id");
+        for (Object object : objects) ids.add(field.getInt(object));
+        int candidate = 0;
+        while (ids.contains(candidate)) candidate++;
+        return candidate;
     }
 }

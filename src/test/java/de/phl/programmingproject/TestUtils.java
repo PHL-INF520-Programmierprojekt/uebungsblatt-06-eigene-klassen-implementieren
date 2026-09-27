@@ -51,18 +51,19 @@ public class TestUtils {
 
         // Create a stream to hold the output
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream newOut = new PrintStream(baos);
+        PrintStream newOut = new PrintStream(baos, true, java.nio.charset.StandardCharsets.UTF_8);
 
         // Set the new stream as the standard out
         System.setOut(newOut);
 
         // Call the action that prints to the system out
-        actionThatPrintsToSystemOut.run();
+        try {
+            actionThatPrintsToSystemOut.run();
+        } finally {
+            System.setOut(originalOut);
+        }
 
-        // Reset the standard out
-        System.setOut(originalOut);
-
-        String output = baos.toString();
+        String output = baos.toString(java.nio.charset.StandardCharsets.UTF_8).replace("\r\n", "\n");
         return output;
     }
 
@@ -82,7 +83,7 @@ public class TestUtils {
         // load content of the file
         String txt;
         try {
-            txt = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            txt = new String(Files.readAllBytes(path), StandardCharsets.UTF_8).replace("\r\n", "\n");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,0 +1,15 @@
+{
+  "java.test.config": {
+    "name": "INF520",
+    "workingDirectory": "${workspaceFolder}",
+    "preLaunchTask": "INF520: Tests vorbereiten",
+    "vmArgs": [
+      "-javaagent:${workspaceFolder}/build/test-agent/mockito-agent.jar",
+      "-Dfile.encoding=UTF-8",
+      "-Dstdout.encoding=UTF-8",
+      "-Dstderr.encoding=UTF-8"
+    ]
+  },
+  "java.test.defaultConfig": "INF520",
+  "files.encoding": "utf8"
+}

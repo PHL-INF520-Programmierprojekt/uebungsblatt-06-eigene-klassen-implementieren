@@ -16,11 +16,9 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"github.classroom",
-				"oracle.oracle-java",
+				"vscjava.vscode-java-pack",
 				"mermaidchart.vscode-mermaid-chart",
-				"yzhang.markdown-all-in-one",
-				"vscjava.vscode-java-test"
+				"yzhang.markdown-all-in-one"
 			],
 			"settings": {
 				"java.server.launchMode": "Standard",
@@ -29,7 +27,6 @@
 				"git.postCommitCommand": "sync",
 				// point to the Java 21 JDK installed in the container, so it does not look for a JDK installed by SDKMAN (which is not installed in this container due to "version":"none" in "ghcr.io/devcontainers/features/java:1")
 				// an alternative to make gradle still work, is specifying the JDK in SDKMAN, e.g., "version":"21" or "version":"latest", and then use that JDK version.
-				"java.jdt.ls.home": "/usr/local/openjdk-21",
 				"java.import.gradle.java.home": "/usr/local/openjdk-21"
 			}
 		}

@@ -12,7 +12,7 @@ public class TestBase {
     /**
      * The stream that is used to redirect the system out.
      */
-    protected PrintStream outStream = new PrintStream(byteArrayOutputStream);
+    protected PrintStream outStream = new PrintStream(byteArrayOutputStream, true, java.nio.charset.StandardCharsets.UTF_8);
 
     PrintStream originalOut = System.out;
 
@@ -31,7 +31,7 @@ public class TestBase {
      * @return
      */
     public String getSystemOut() {
-        return byteArrayOutputStream.toString();
+        return byteArrayOutputStream.toString(java.nio.charset.StandardCharsets.UTF_8).replace("\r\n", "\n");
     }
 
     /**
